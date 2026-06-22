@@ -16,7 +16,7 @@
     "Create FeedItemRepository with findByFeedName",
     "Create FeedItemService.registerFeed() method",
     "Create FeedItemController POST /api/v1/feed/inventory",
-    "Write Flyway migration V10__create_feed_inventory.sql",
+    "Write Liquibase migration V10__create_feed_inventory.sql",
     "Write unit tests for FeedItemService",
     "Write integration test with TestContainers"
   ],
@@ -117,7 +117,7 @@
     "Create FeedConsumptionRepository with findByAnimalId",
     "Create FeedConsumptionService.recordConsumption() method",
     "Create FeedConsumptionController POST /api/v1/feed/consumption",
-    "Write Flyway migration V11__create_feed_consumption.sql",
+    "Write Liquibase migration V11__create_feed_consumption.sql",
     "Write unit tests for FeedConsumptionService",
     "Write integration test with TestContainers"
   ],

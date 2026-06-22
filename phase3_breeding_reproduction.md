@@ -16,7 +16,7 @@
     "Create BreedingEventRepository with findByAnimalIds",
     "Create BreedingEventService.registerBreedingEvent() method",
     "Create BreedingEventController POST /api/v1/breeding/events",
-    "Write Flyway migration V5__create_breeding_events.sql",
+    "Write Liquibase migration V5__create_breeding_events.sql",
     "Write unit tests for BreedingEventService",
     "Write integration test with TestContainers"
   ],
@@ -85,7 +85,7 @@
     "Create PregnancyRepository with findByBreedingEventId",
     "Create PregnancyService.confirmPregnancy() method",
     "Create PregnancyController POST /api/v1/breeding/{eventId}/pregnancy",
-    "Write Flyway migration V6__create_pregnancies.sql",
+    "Write Liquibase migration V6__create_pregnancies.sql",
     "Write unit tests for PregnancyService",
     "Write integration test with TestContainers"
   ],
@@ -153,7 +153,7 @@
     "Create BirthEventRepository with findByPregnancyId",
     "Create BirthEventService.registerBirth() method",
     "Create BirthEventController POST /api/v1/births",
-    "Write Flyway migration V7__create_birth_events.sql",
+    "Write Liquibase migration V7__create_birth_events.sql",
     "Write unit tests for BirthEventService",
     "Write integration test with TestContainers"
   ],

@@ -16,7 +16,7 @@
     "Create PurchaseTransactionRepository with findByAnimalId",
     "Create PurchaseTransactionService.registerPurchase() method",
     "Create PurchaseTransactionController POST /api/v1/transactions/purchases",
-    "Write Flyway migration V12__create_purchase_transactions.sql",
+    "Write Liquibase migration V12__create_purchase_transactions.sql",
     "Write unit tests for PurchaseTransactionService",
     "Write integration test with TestContainers"
   ],
@@ -52,7 +52,7 @@
     "Create SaleTransactionRepository with findByAnimalId",
     "Create SaleTransactionService.registerSale() method",
     "Create SaleTransactionController POST /api/v1/transactions/sales",
-    "Write Flyway migration V13__create_sale_transactions.sql",
+    "Write Liquibase migration V13__create_sale_transactions.sql",
     "Write unit tests for SaleTransactionService",
     "Write integration test with TestContainers"
   ],
@@ -152,7 +152,7 @@
     "Create ExpenseTransactionRepository",
     "Create ExpenseTransactionService.registerExpense() method",
     "Create ExpenseTransactionController POST /api/v1/transactions/expenses",
-    "Write Flyway migration V14__create_expense_transactions.sql",
+    "Write Liquibase migration V14__create_expense_transactions.sql",
     "Write unit tests for ExpenseTransactionService",
     "Write integration test with TestContainers"
   ],

@@ -36,7 +36,7 @@
 | GitHub Actions CI pipeline (build, test, lint) | DevOps | 1d |
 | Keycloak realm setup (roles, clients) | Backend Lead | 1d |
 | Spring Boot project scaffolding (all 8 services) | Backend Lead | 2d |
-| Flyway migration setup per service | Backend | 1d |
+| Liquibase migration setup per service | Backend | 1d |
 | API Gateway routing + JWT filter | Backend Lead | 2d |
 | farm-common library (shared DTOs, events) | Backend Lead | 1d |
 | React app scaffold + auth integration | Frontend | 2d |
@@ -57,7 +57,7 @@
 - Animal status transitions
 - Redis caching for animal profiles
 - Kafka publishing: `animal.registered`, `animal.status.changed`
-- Flyway migrations: V1-V3
+- Liquibase migrations: V1-V3
 
 #### Frontend / Mobile
 - Animal list screen with search/filter
@@ -244,7 +244,7 @@
 - [ ] Unit test coverage ≥ 80% for new code
 - [ ] Integration test covering happy path + key error cases
 - [ ] API documented in OpenAPI spec
-- [ ] Flyway migration included (if DB change)
+- [ ] Liquibase migration included (if DB change)
 - [ ] No critical SonarQube issues
 - [ ] Feature tested on local docker-compose environment
 - [ ] Deployed to dev environment via CI/CD

@@ -74,9 +74,9 @@
 
 **Status:** Decided  
 **Context:** Need deterministic, versioned DB schema management.  
-**Decision:** **Flyway** — versioned SQL migrations.  
+**Decision:** **Liquibase** — versioned SQL migrations.  
 **Rationale:** SQL-first (no DSL to learn), integrates with Spring Boot auto-run on startup, version-controlled alongside code.  
-**Consequence:** `spring.jpa.hibernate.ddl-auto=validate` in all environments — Hibernate never creates/alters tables, Flyway owns schema.
+**Consequence:** `spring.jpa.hibernate.ddl-auto=validate` in all environments — Hibernate never creates/alters tables, Liquibase owns schema.
 
 ---
 

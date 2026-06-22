@@ -54,7 +54,8 @@ farm-animal-service/
 │       └── AnimalMapper.java       (MapStruct)
 ├── src/main/resources/
 │   ├── application.yml
-│   └── db/migration/               (Flyway)
+│   └── db/migration/               (Liquibase)
+│       ├── changelog.xml
 │       ├── V1__create_animals.sql
 │       └── V2__create_herds.sql
 └── pom.xml
@@ -127,8 +128,8 @@ farm-animal-service/
         <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-core</artifactId>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
     </dependency>
 
     <!-- Utilities -->
@@ -367,7 +368,7 @@ spring:
       minimum-idle: 2
   jpa:
     hibernate:
-      ddl-auto: validate        # Flyway manages schema
+      ddl-auto: validate        # Liquibase manages schema
     properties:
       hibernate.default_schema: farm_animals
   data:

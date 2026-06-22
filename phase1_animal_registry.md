@@ -16,7 +16,7 @@
     "Create AnimalRepository with findByFarmIdAndTagNumber",
     "Create AnimalService.registerAnimal() with duplicate check",
     "Create AnimalController POST /api/v1/animals",
-    "Write Flyway migration V1__create_animals.sql",
+    "Write Liquibase migration V1__create_animals.sql",
     "Write unit tests for AnimalService",
     "Write integration test with TestContainers"
   ],
@@ -195,7 +195,7 @@
     "Create HerdRepository",
     "Create HerdService with validation",
     "Create HerdController with all CRUD endpoints",
-    "Write Flyway migration V2__create_herds.sql",
+    "Write Liquibase migration V2__create_herds.sql",
     "Add business rule to prevent deletion of herds with animals",
     "Write unit tests for HerdService",
     "Write integration test with TestContainers"

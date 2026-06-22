@@ -16,7 +16,7 @@
     "Create HealthRecordRepository with findByAnimalId",
     "Create HealthRecordService.registerHealthRecord() with animal existence check",
     "Create HealthRecordController POST /api/v1/animals/{animalId}/health",
-    "Write Flyway migration V3__create_health_records.sql",
+    "Write Liquibase migration V3__create_health_records.sql",
     "Write unit tests for HealthRecordService",
     "Write integration test with TestContainers"
   ],
@@ -119,7 +119,7 @@
     "Create HealthScheduleRepository with findByAnimalId and date range queries",
     "Create HealthScheduleService.scheduleCheckup() method",
     "Create HealthScheduleController POST /api/v1/animals/{animalId}/health/schedule",
-    "Write Flyway migration V4__create_health_schedules.sql",
+    "Write Liquibase migration V4__create_health_schedules.sql",
     "Write unit tests for HealthScheduleService",
     "Write integration test with TestContainers"
   ],

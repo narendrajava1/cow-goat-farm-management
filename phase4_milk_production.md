@@ -16,7 +16,7 @@
     "Create MilkProductionRepository with findByAnimalIdAndDate",
     "Create MilkProductionService.registerProduction() method",
     "Create MilkProductionController POST /api/v1/milk/production",
-    "Write Flyway migration V8__create_milk_production.sql",
+    "Write Liquibase migration V8__create_milk_production.sql",
     "Write unit tests for MilkProductionService",
     "Write integration test with TestContainers"
   ],
@@ -182,7 +182,7 @@
     "Create MilkTargetRepository with findByAnimalId and herdId",
     "Create MilkTargetService.setTarget() method",
     "Create MilkTargetController POST /api/v1/milk/targets",
-    "Write Flyway migration V9__create_milk_targets.sql",
+    "Write Liquibase migration V9__create_milk_targets.sql",
     "Write unit tests for MilkTargetService",
     "Write integration test with TestContainers"
   ],
