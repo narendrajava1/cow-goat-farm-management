@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: farm-animal-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/farm_animals
+    username: ${DB_USER:farm_user}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_schema: public
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+      lettuce:
+        pool:
+          max-active: 8
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: animal-service
+      auto-offset-reset: earliest
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL}/realms/farm-management
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      animal-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+
+logging:
+  level:
+    com.cgfms: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] [traceId=%X{traceId}] %-5level %logger{36} - %msg%n"
