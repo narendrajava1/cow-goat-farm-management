@@ -1964,3 +1964,308 @@ Next we'll build **Redis**. We'll discuss:
 * When Redis should use a PVC.
 * How Spring Boot connects to Redis using Kubernetes DNS.
 * How to deploy Redis with production-ready health probes and resource limits. This is also where we'll start introducing **liveness** and **readiness** probes.
+Yes, **absolutely!** In fact, I **want you to run it locally now**. This is exactly how we validate our Kubernetes setup incrementally.
+
+However, there are a couple of changes we should make first.
+
+---
+
+# Where are we now?
+
+We have deployed (or are creating):
+
+```text
+Kubernetes
+
+├── PostgreSQL
+├── Redis
+├── Kafka
+├── ZooKeeper
+└── (Soon) Animal Service
+```
+
+Your Spring Boot application should connect to these services.
+
+---
+
+# Option 1 (Recommended): Run Spring Boot Locally
+
+Run only your Spring Boot application on your laptop.
+
+```text
+             Local Machine
+             ┌─────────────┐
+             │ Spring Boot │
+             └──────┬──────┘
+                    │
+          ┌─────────┼─────────┐
+          │         │         │
+      PostgreSQL  Redis     Kafka
+          │         │         │
+      Kubernetes Cluster
+```
+
+This is the easiest way to debug.
+
+---
+
+# But there's a problem...
+
+Your `ConfigMap` currently contains:
+
+```yaml
+DB_HOST=postgresql
+REDIS_HOST=redis
+KAFKA_BROKERS=kafka:9092
+```
+
+Those names only work **inside Kubernetes** because Kubernetes DNS resolves them.
+
+Your laptop **does not know** what `postgresql` or `redis` means.
+
+---
+
+# Solution 1 (Easiest)
+
+If you are using **Kind** or **Minikube**, expose the services to your host.
+
+Example:
+
+```bash
+kubectl port-forward svc/postgresql 5432:5432 -n farm-animal
+
+kubectl port-forward svc/redis 6379:6379 -n farm-animal
+
+kubectl port-forward svc/kafka 9092:9092 -n farm-animal
+```
+
+Now your laptop can connect to
+
+```text
+localhost:5432
+localhost:6379
+localhost:9092
+```
+
+---
+
+# Then run Spring Boot like this
+
+```bash
+export DB_HOST=localhost
+export DB_PORT=5432
+
+export REDIS_HOST=localhost
+export REDIS_PORT=6379
+
+export KAFKA_BROKERS=localhost:9092
+
+export DB_PASSWORD=farm_password
+export DB_USER=farm_user
+export DB_NAME=farm_animals
+
+./mvnw spring-boot:run
+```
+
+or
+
+```bash
+mvn spring-boot:run
+```
+
+This is exactly how many developers work.
+
+---
+
+# Option 2 (My Favorite)
+
+Don't deploy PostgreSQL, Redis, or Kafka in Kubernetes yet.
+
+Use Docker Compose for them.
+
+```text
+Docker Compose
+
+Postgres
+
+Redis
+
+Kafka
+
+↓
+
+Spring Boot (IDE)
+```
+
+This is the fastest development workflow.
+
+Many companies do this.
+
+---
+
+# Option 3 (Best Production Simulation)
+
+Deploy everything.
+
+```text
+Kind Cluster
+
+↓
+
+Spring Boot Pod
+
+↓
+
+Postgres Pod
+
+↓
+
+Redis Pod
+
+↓
+
+Kafka Pod
+```
+
+No local Spring Boot.
+
+Everything runs inside Kubernetes.
+
+We'll do this after the image is built.
+
+---
+
+# I Recommend This Workflow
+
+### Phase 1 (Now)
+
+Run
+
+```text
+Spring Boot
+
+↓
+
+IntelliJ
+```
+
+Infrastructure
+
+```text
+PostgreSQL
+
+Redis
+
+Kafka
+```
+
+inside Kubernetes (or Docker Compose).
+
+This gives you fast debugging.
+
+---
+
+### Phase 2
+
+Build Docker image.
+
+```bash
+docker build -t farm-animal-service:1.0.0 .
+```
+
+---
+
+### Phase 3
+
+Load image into your cluster.
+
+If you're using **Kind**:
+
+```bash
+kind load docker-image farm-animal-service:1.0.0
+```
+
+If you're using **Minikube**:
+
+```bash
+minikube image load farm-animal-service:1.0.0
+```
+
+---
+
+### Phase 4
+
+Update your Deployment.
+
+```yaml
+image: farm-animal-service:1.0.0
+imagePullPolicy: Never   # For local development
+```
+
+or, if you've loaded it into the cluster image cache:
+
+```yaml
+imagePullPolicy: IfNotPresent
+```
+
+---
+
+### Phase 5
+
+Deploy.
+
+```bash
+kubectl apply -k overlays/dev
+```
+
+Now your entire application runs inside Kubernetes.
+
+---
+
+# Before You Run It
+
+I noticed one issue in your Spring configuration:
+
+You currently have:
+
+```yaml
+url: r2dbcs://${DB_HOST:localhost}:5432/farm_animals
+```
+
+It should be:
+
+```yaml
+url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:farm_animals}
+```
+
+Otherwise, your application won't connect correctly.
+
+---
+
+## I have one question before we continue
+
+**Which local Kubernetes are you using?**
+
+* **Kind**
+* **Minikube**
+* **Docker Desktop Kubernetes**
+* **Rancher Desktop**
+* Something else?
+
+Also, are you on **macOS** (I believe you are, based on our previous conversations)? That will let me give you the exact commands for loading images and exposing services.
+to run in local DB_HOST=localhost;
+DB_PORT=5432;
+DB_NAME=farm_animals;
+DB_USER=farm_user;
+DB_PASSWORD=farm_password;
+REDIS_HOST=localhost;
+REDIS_PORT=6379;
+KAFKA_BROKERS=localhost:9092;
+SPRING_PROFILES_ACTIVE=dev
+
+
+kubectl port-forward svc/postgresql 5432:5432 -n farm-animal
+
+kubectl port-forward svc/redis 6379:6379 -n farm-animal
+
+kubectl port-forward svc/kafka 9092:9092 -n farm-animal
