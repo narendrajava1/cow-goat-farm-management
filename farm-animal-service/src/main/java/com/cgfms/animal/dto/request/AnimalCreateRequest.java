@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 public class AnimalCreateRequest {
@@ -18,6 +19,6 @@ public class AnimalCreateRequest {
     private com.cgfms.animal.domain.Gender gender;
     
     private LocalDate dateOfBirth;
-    
-    private String herdId;
+
+    private UUID herdId;
 }

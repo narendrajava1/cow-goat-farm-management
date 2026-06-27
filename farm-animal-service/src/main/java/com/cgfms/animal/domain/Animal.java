@@ -1,19 +1,24 @@
 package com.cgfms.animal.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import com.cgfms.animal.exception.InvalidStatusTransitionException;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Entity
-@Table(name = "animals")
+/**
+ * R2DBC entity — no JPA/Hibernate annotations.
+ * Associations are resolved as foreign-key IDs; reactive repositories handle joins via DTO projections.
+ */
+@Table("animals")
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,37 +26,30 @@ import java.util.UUID;
 public class Animal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "farm_id", nullable = false)
+    @Column("farm_id")
     private UUID farmId;
 
-    @Column(name = "tag_number", nullable = false, unique = true)
+    @Column("tag_number")
     private String tagNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "animal_type", nullable = false)
+    @Column("animal_type")
     private AnimalType animalType;
 
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private AnimalStatus status = AnimalStatus.ACTIVE;
 
-    @Column(name = "date_of_birth")
+    @Column("date_of_birth")
     private LocalDate dateOfBirth;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "herd_id")
-    private Herd herd;
+    // R2DBC stores FK as a scalar UUID; the owning Herd entity is resolved lazily by the service layer
+    @Column("herd_id")
+    private UUID herdId;
 
-    @CreationTimestamp
     private Instant createdAt;
 
-    @UpdateTimestamp
     private Instant updatedAt;
 
     // Business method — encapsulate status transitions

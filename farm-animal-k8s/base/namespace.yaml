@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: farm-animal
+
+  labels:
+    app.kubernetes.io/name: farm-animal
+    app.kubernetes.io/part-of: farm-platform
+    environment: base

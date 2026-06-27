@@ -1,91 +1,90 @@
 package com.cgfms.animal.service;
 
+import com.cgfms.animal.cache.HerdCacheService;
 import com.cgfms.animal.domain.Animal;
 import com.cgfms.animal.domain.Herd;
 import com.cgfms.animal.dto.request.HerdCreateRequest;
 import com.cgfms.animal.dto.response.HerdResponse;
-import com.cgfms.animal.exception.DuplicateTagException;
+import com.cgfms.animal.exception.BusinessException;
+import com.cgfms.animal.exception.ResourceNotFoundException;
 import com.cgfms.animal.mapper.HerdMapper;
 import com.cgfms.animal.repository.AnimalRepository;
 import com.cgfms.animal.repository.HerdRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class HerdService {
-    
+
     private final HerdRepository herdRepository;
     private final AnimalRepository animalRepository;
-    private final HerdMapper mapper;
-    
-    @Transactional
-    public HerdResponse createHerd(HerdCreateRequest request, UUID farmId) {
-        // Validate unique herd name for farm
-        if (herdRepository.existsByFarmIdAndName(farmId, request.getName())) {
-            throw new DuplicateTagException(request.getName());
-        }
-        
-        Herd herd = mapper.toEntity(request);
-        herd.setFarmId(farmId);
-        Herd saved = herdRepository.save(herd);
-        
-        log.info("Herd created: name={}", saved.getName());
-        return mapper.toResponse(saved);
+    private final HerdMapper herdMapper;
+    private final HerdCacheService herdCacheService;
+
+    public Mono<HerdResponse> createHerd(HerdCreateRequest request, UUID farmId) {
+        return herdRepository.existsByFarmIdAndName(farmId, request.getName())
+                .flatMap(exists -> {
+                    if (exists) return Mono.error(new BusinessException(
+                            "Herd '" + request.getName() + "' already exists in this farm"));
+                    Herd herd = herdMapper.toEntity(request);
+                    herd.setFarmId(farmId);
+                    return herdRepository.save(herd)
+                            .map(herdMapper::toResponse)
+                            .flatMap(response -> herdCacheService.put(response)
+                                    .then(herdCacheService.evictList(farmId))
+                                    .thenReturn(response))
+                            .doOnSuccess(r -> log.info("Herd created: name={}, farmId={}", r.getName(), farmId));
+                });
     }
-    
-    @Transactional(readOnly = true)
-    public HerdResponse getHerdById(UUID herdId, UUID farmId) {
+
+    public Mono<HerdResponse> getHerdById(UUID herdId, UUID farmId) {
+        return herdCacheService.get(herdId)
+                .switchIfEmpty(
+                        herdRepository.findById(herdId)
+                                .filter(h -> h.getFarmId().equals(farmId))
+                                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Herd", herdId)))
+                                .map(herdMapper::toResponse)
+                                .flatMap(herdCacheService::put)
+                );
+    }
+
+    public Mono<HerdResponse> updateHerd(UUID herdId, HerdCreateRequest request, UUID farmId) {
         return herdRepository.findById(herdId)
-            .filter(herd -> herd.getFarmId().equals(farmId))
-            .map(mapper::toResponse)
-            .orElseThrow(() -> new RuntimeException("Herd not found"));
+                .filter(h -> h.getFarmId().equals(farmId))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Herd", herdId)))
+                .flatMap(herd -> {
+                    herd.setName(request.getName());
+                    herd.setDescription(request.getDescription());
+                    herd.setHerdType(request.getHerdType());
+                    return herdRepository.save(herd);
+                })
+                .map(herdMapper::toResponse)
+                .flatMap(response -> herdCacheService.evictAll(herdId, farmId)
+                        .thenReturn(response))
+                .doOnSuccess(r -> log.info("Herd updated: id={}", herdId));
     }
-    
-    @Transactional
-    public HerdResponse updateHerd(UUID herdId, HerdCreateRequest request, UUID farmId) {
-        Herd herd = herdRepository.findById(herdId)
-            .filter(h -> h.getFarmId().equals(farmId))
-            .orElseThrow(() -> new RuntimeException("Herd not found"));
-        
-        // Check for duplicate name if it's changing
-        if (!herd.getName().equals(request.getName())) {
-            if (herdRepository.existsByFarmIdAndName(farmId, request.getName())) {
-                throw new DuplicateTagException(request.getName());
-            }
-        }
-        
-        herd.setName(request.getName());
-        herd.setDescription(request.getDescription());
-        herd.setHerdType(request.getHerdType());
-        
-        Herd updated = herdRepository.save(herd);
-        return mapper.toResponse(updated);
+
+    public Mono<Void> deleteHerd(UUID herdId, UUID farmId) {
+        return herdRepository.findById(herdId)
+                .filter(h -> h.getFarmId().equals(farmId))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Herd", herdId)))
+                .flatMap(herd -> herdRepository.delete(herd)
+                        .then(herdCacheService.evictAll(herdId, farmId)))
+                .doOnSuccess(v -> log.info("Herd deleted: id={}", herdId));
     }
-    
-    @Transactional
-    public void deleteHerd(UUID herdId, UUID farmId) {
-        Herd herd = herdRepository.findById(herdId)
-            .filter(h -> h.getFarmId().equals(farmId))
-            .orElseThrow(() -> new RuntimeException("Herd not found"));
-        
-        // Check if herd has animals
-        List<Animal> animalsInHerd = animalRepository.findByFarmIdAndHerdId(farmId, herdId);
-        if (!animalsInHerd.isEmpty()) {
-            throw new RuntimeException("Cannot delete herd with animals assigned to it");
-        }
-        
-        herdRepository.deleteById(herdId);
-    }
-    
-    @Transactional(readOnly = true)
-    public List<Animal> getAnimalsByHerdId(UUID herdId, UUID farmId) {
-        return animalRepository.findByFarmIdAndHerdId(farmId, herdId);
+
+    // ← Missing method that HerdController calls
+    public Flux<Animal> getAnimalsByHerdId(UUID herdId, UUID farmId) {
+        return herdRepository.findById(herdId)
+                .filter(h -> h.getFarmId().equals(farmId))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Herd", herdId)))
+                .flatMapMany(herd -> animalRepository.findByHerdId(herdId));
     }
 }

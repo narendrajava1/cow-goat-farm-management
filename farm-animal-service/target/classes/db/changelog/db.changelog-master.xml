@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Version 1 -->
+    <changeSet id="1" author="narendra">
+        <sqlFile
+                path="changes/V1__create_animals.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                endDelimiter=";"
+                stripComments="true"/>
+    </changeSet>
+
+    <!-- Version 2 -->
+    <changeSet id="2" author="narendra">
+        <sqlFile
+                path="changes/V2__create_herds.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                endDelimiter=";"
+                stripComments="true"/>
+    </changeSet>
+
+    <!-- db.changelog-master.xml — add this -->
+    <changeSet id="3" author="narendra">
+        <sqlFile
+                path="changes/V3__fix_herd_type_constraint.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                endDelimiter=";"
+                stripComments="true"/>
+    </changeSet>
+
+</databaseChangeLog>

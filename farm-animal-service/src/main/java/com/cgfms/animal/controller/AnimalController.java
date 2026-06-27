@@ -8,60 +8,59 @@ import com.cgfms.animal.service.AnimalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
+/**
+ * WebFlux controller — all endpoints return reactive types (Mono/Flux).
+ */
 @RestController
 @RequestMapping("/api/v1/animals")
 @RequiredArgsConstructor
 public class AnimalController {
-    
+
     private final AnimalService animalService;
-    
+
     @PostMapping
-    public ResponseEntity<AnimalResponse> registerAnimal(
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<AnimalResponse> registerAnimal(
             @Valid @RequestBody AnimalCreateRequest request,
             @RequestHeader("farm-id") UUID farmId) {
-        AnimalResponse response = animalService.registerAnimal(request, farmId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return animalService.registerAnimal(request, farmId);
     }
-    
+
     @GetMapping("/{animalId}")
-    public ResponseEntity<AnimalResponse> getAnimal(
+    public Mono<AnimalResponse> getAnimal(
             @PathVariable UUID animalId,
             @RequestHeader("farm-id") UUID farmId) {
-        AnimalResponse response = animalService.getAnimalById(animalId, farmId);
-        return ResponseEntity.ok(response);
+        return animalService.getAnimalById(animalId, farmId);
     }
-    
+
     @GetMapping
-    public ResponseEntity<List<AnimalResponse>> listAnimals(
+    public Flux<AnimalResponse> listAnimals(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String gender,
             @RequestParam(required = false) String status,
             @RequestHeader("farm-id") UUID farmId) {
-        List<AnimalResponse> response = animalService.listAnimals(farmId, type, gender, status);
-        return ResponseEntity.ok(response);
+        return animalService.listAnimals(farmId, type, gender, status);
     }
-    
+
     @PutMapping("/{animalId}")
-    public ResponseEntity<AnimalResponse> updateAnimal(
+    public Mono<AnimalResponse> updateAnimal(
             @PathVariable UUID animalId,
             @Valid @RequestBody AnimalUpdateRequest request,
             @RequestHeader("farm-id") UUID farmId) {
-        AnimalResponse response = animalService.updateAnimal(animalId, request, farmId);
-        return ResponseEntity.ok(response);
+        return animalService.updateAnimal(animalId, request, farmId);
     }
-    
+
     @PatchMapping("/{animalId}/status")
-    public ResponseEntity<AnimalResponse> changeStatus(
+    public Mono<AnimalResponse> changeStatus(
             @PathVariable UUID animalId,
             @Valid @RequestBody AnimalStatusUpdateRequest request,
             @RequestHeader("farm-id") UUID farmId) {
-        AnimalResponse response = animalService.changeAnimalStatus(animalId, request.getStatus(), farmId);
-        return ResponseEntity.ok(response);
+        return animalService.changeAnimalStatus(animalId, request.getStatus(), farmId);
     }
 }

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: animal-config
+  namespace: farm-animal
+
+data:
+
+  SPRING_PROFILES_ACTIVE: dev
+
+  DB_HOST: postgresql
+  DB_PORT: "5432"
+  DB_NAME: farm_animals
+  DB_USER: farm_user
+
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+
+  KAFKA_BROKERS: kafka:9092
+  KAFKA_GROUP_ID: animal-service
+
+  SERVER_PORT: "8080"

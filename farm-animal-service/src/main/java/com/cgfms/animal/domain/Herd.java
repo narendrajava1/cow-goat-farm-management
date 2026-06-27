@@ -1,18 +1,20 @@
 package com.cgfms.animal.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity
-@Table(name = "herds")
+/**
+ * R2DBC entity — no JPA/Hibernate annotations.
+ */
+@Table("herds")
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,25 +22,19 @@ import java.util.UUID;
 public class Herd {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "farm_id", nullable = false)
+    @Column("farm_id")
     private UUID farmId;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(name = "description")
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "herd_type", nullable = false)
+    @Column("herd_type")
     private HerdType herdType;
 
-    @CreationTimestamp
     private Instant createdAt;
 
-    @UpdateTimestamp
     private Instant updatedAt;
 }

@@ -13,6 +13,7 @@ public interface HerdMapper {
     HerdResponse toResponse(Herd herd);
     
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "farmId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Herd toEntity(HerdCreateRequest request);
